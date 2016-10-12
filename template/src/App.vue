@@ -7,12 +7,12 @@
 
 <script>
 export default {
-  data () {
+  data{{#if_eq lintConfig "standard"}} {{/if_eq}}() {
     return {
-      msg: 'Hello Vue!'
-    }
-  }
-}
+      msg: 'Hello Vue!'{{#if_eq lintConfig "airbnb"}},{{/if_eq}}
+    }{{#if_eq lintConfig "airbnb"}};{{/if_eq}}
+  }{{#if_eq lintConfig "airbnb"}},{{/if_eq}}
+}{{#if_eq lintConfig "airbnb"}};{{/if_eq}}
 </script>
 
 <style>

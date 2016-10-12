@@ -8,10 +8,32 @@ module.exports = {
     publicPath: '/dist/',
     filename: 'build.js'
   },
+  resolve: {
+    extensions: ['', '.js', '.vue'],
+    alias: {
+      'src': path.resolve(__dirname, './src'),
+    }
+  },
   resolveLoader: {
     root: path.join(__dirname, 'node_modules'),
   },
   module: {
+    {{#lint}}
+    preLoaders: [
+      {
+        test: /\.vue$/,
+        loader: 'eslint',
+        include: path.resolve(__dirname, '.'),
+        exclude: /node_modules/
+      },
+      {
+        test: /\.js$/,
+        loader: 'eslint',
+        include: path.resolve(__dirname, '.'),
+        exclude: /node_modules/
+      }
+    ],
+    {{/lint}}
     loaders: [
       {
         test: /\.vue$/,
@@ -35,7 +57,12 @@ module.exports = {
     historyApiFallback: true,
     noInfo: true
   },
-  devtool: '#eval-source-map'
+  devtool: '#eval-source-map',
+  {{#lint}}
+  eslint: {
+    formatter: require('eslint-friendly-formatter')
+  },
+  {{/lint}}
 }
 
 if (process.env.NODE_ENV === 'production') {
