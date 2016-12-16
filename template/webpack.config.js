@@ -9,60 +9,53 @@ module.exports = {
     filename: 'build.js'
   },
   resolve: {
-    extensions: ['', '.js', '.vue'],
+    extensions: ['.js', '.vue'],
     alias: {
-      'src': path.resolve(__dirname, './src'),
+      'vue$': 'vue/dist/vue.common.js',
     }
   },
-  resolveLoader: {
-    root: path.join(__dirname, 'node_modules'),
-  },
   module: {
-    {{#lint}}
-    preLoaders: [
+    rules: [
+      {{#lint}}
+      {
+        test: /\.(vue|js)$/,
+        loader: 'eslint',
+        exclude: /node_modules/,
+        enforce: 'pre',
+        options: {
+          formatter: require('eslint-friendly-formatter'),
+        },
+      },
+      {{/lint}}
       {
         test: /\.vue$/,
-        loader: 'eslint',
-        include: path.resolve(__dirname, '.'),
-        exclude: /node_modules/
+        loader: 'vue-loader',
+        options: {
+          loaders: {
+            'scss': 'vue-style-loader!css-loader!sass-loader',
+            'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
+          }
+        }
       },
       {
         test: /\.js$/,
-        loader: 'eslint',
-        include: path.resolve(__dirname, '.'),
-        exclude: /node_modules/
-      }
-    ],
-    {{/lint}}
-    loaders: [
-      {
-        test: /\.vue$/,
-        loader: 'vue'
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel',
+        loader: 'babel-loader',
         exclude: /node_modules/
       },
       {
         test: /\.(png|jpg|gif|svg)$/,
-        loader: 'file',
-        query: {
+        loader: 'file-loader',
+        options: {
           name: '[name].[ext]?[hash]'
         }
-      }
-    ]
+      },
+    ],
   },
   devServer: {
     historyApiFallback: true,
     noInfo: true
   },
   devtool: '#eval-source-map',
-  {{#lint}}
-  eslint: {
-    formatter: require('eslint-friendly-formatter')
-  },
-  {{/lint}}
 }
 
 if (process.env.NODE_ENV === 'production') {
@@ -75,9 +68,13 @@ if (process.env.NODE_ENV === 'production') {
       }
     }),
     new webpack.optimize.UglifyJsPlugin({
+      sourceMap: true,
       compress: {
         warnings: false
       }
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
     })
   ])
 }
